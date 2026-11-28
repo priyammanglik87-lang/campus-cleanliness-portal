@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Campus Cleanliness Feedback Portal | Punjab Kings</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <!-- Mandatory Authentication Gate -->
+  <section id="authGate" class="auth-wrapper" aria-labelledby="auth-heading">
+    <div class="auth-card">
+      <div class="auth-brand">
+        <span class="topic-pill">/campus-cleanliness-feedback-portal</span>
+        <h1 id="auth-heading">Campus Cleanliness Feedback Portal</h1>
+        <p>Sign in or set your unique credentials to access the portal </p>
+      </div>
+
+      <div class="auth-tabs" role="tablist">
+        <button id="tabLoginBtn" class="auth-tab active" type="button" role="tab">Login</button>
+        <button id="tabRegisterBtn" class="auth-tab" type="button" role="tab">Set Credentials (First Time)</button>
+      </div>
+
+      <div id="authAlert" class="alert hidden" role="alert"></div>
+
+      <!-- Login Form -->
+      <form id="loginForm" novalidate>
+        <div class="form-group">
+          <label for="loginFullName">Full Name *</label>
+          <input
+            type="text"
+            id="loginFullName"
+            placeholder="e.g., Priyam Manglik"
+            maxlength="50"
+            autocomplete="name"
+          />
+          <small class="error-text" id="err-loginFullName"></small>
+        </div>
+
+        <div class="form-group">
+          <label for="loginRegNo">Registration Number *</label>
+          <input
+            type="text"
+            id="loginRegNo"
+            placeholder="e.g., 12616721"
+            maxlength="25"
+            autocomplete="username"
+          />
+          <small class="error-text" id="err-loginRegNo"></small>
+        </div>
+
+        <div class="form-group">
+          <label for="loginPassword">Password *</label>
+          <input
+            type="password"
+            id="loginPassword"
+            placeholder="Enter your set password"
+            autocomplete="current-password"
+          />
+          <small class="error-text" id="err-loginPassword"></small>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-full">Login &amp; Access Portal</button>
+      </form>
+
+      <!-- First-Time Credential Setup Form -->
+      <form id="registerForm" class="hidden" novalidate>
+        <div class="form-group">
+          <label for="regFullName">Full Name *</label>
+          <input
+            type="text"
+            id="regFullName"
+            placeholder="e.g., Priyam Manglik"
+            maxlength="50"
+            autocomplete="name"
+          />
+          <small class="error-text" id="err-regFullName"></small>
+        </div>
+
+        <div class="form-group">
+          <label for="regNumber">Registration Number *</label>
+          <input
+            type="text"
+            id="regNumber"
+            placeholder="e.g., 12616721"
+            maxlength="25"
+            autocomplete="username"
+          />
+          <small class="error-text" id="err-regNumber"></small>
+        </div>
+
+        <div class="form-group">
+          <label for="regPassword">Create Unique Password *</label>
+          <input
+            type="password"
+            id="regPassword"
+            placeholder="Min 6 chars: 1 Uppercase, 1 Lowercase, 1 Special"
+            autocomplete="new-password"
+          />
+          <small class="error-text" id="err-regPassword"></small>
+        </div>
+
+        <div class="form-group">
+          <label for="regConfirmPassword">Confirm Password *</label>
+          <input
+            type="password"
+            id="regConfirmPassword"
+            placeholder="Re-enter your password"
+            autocomplete="new-password"
+          />
+          <small class="error-text" id="err-regConfirmPassword"></small>
+        </div>
+
+        <ul class="password-rules">
+          <li id="rule-upper">At least 1 uppercase letter (A-Z)</li>
+          <li id="rule-lower">At least 1 lowercase letter (a-z)</li>
+          <li id="rule-special">At least 1 special character (!@#$%^&amp;* etc.)</li>
+          <li id="rule-length">Minimum 6 characters</li>
+        </ul>
+
+        <button type="submit" class="btn btn-primary btn-full">Set Credentials &amp; Enter</button>
+      </form>
+
+      <p class="auth-note">
+        Once a registration number sets a password, access is strictly bound to that registration number and password.
+      </p>
+    </div>
+  </section>
+
+  <!-- Protected Portal Application -->
+  <div id="portalApp" class="hidden">
+    <header class="topbar">
+      <div class="container topbar-inner">
+        <div>
+          <h1>Campus Cleanliness Feedback Portal</h1>
+          <p class="subtitle">
+            Logged in as Reg. No.: <strong id="activeUserReg"></strong> • Team Punjab Kings
+          </p>
+        </div>
+        <div class="header-actions">
+          <div class="role-switch" role="group" aria-label="Portal Role">
+            <button id="roleReporterBtn" class="role-btn active" type="button">
+              Reporter View
+            </button>
+            <button id="roleAdminBtn" class="role-btn" type="button">
+              Admin / Staff View
+            </button>
+          </div>
+          <button id="copySyncLinkBtn" class="btn btn-outline" type="button" title="Copy URL with your credentials & reports to open in another browser">
+            Copy Cross-Browser Link
+          </button>
+          <button id="resetDemoBtn" class="btn btn-outline" type="button" title="Restore initial sample records">
+            Reset Demo
+          </button>
+          <button id="logoutBtn" class="btn btn-outline" type="button">
+            Logout
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="container">
+      <div id="alertBanner" class="alert hidden" role="alert"></div>
+
+      <!-- 1. Dashboard & Summary View -->
+      <section aria-labelledby="dashboard-heading" class="section">
+        <div class="section-header">
+          <h2 id="dashboard-heading">Status &amp; Location Summary</h2>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <span class="kpi-label">Total Complaints</span>
+            <strong id="statTotal" class="kpi-value">0</strong>
+          </div>
+          <div class="kpi-card kpi-reported">
+            <span class="kpi-label">Reported</span>
+            <strong id="statReported" class="kpi-value">0</strong>
+          </div>
+          <div class="kpi-card kpi-progress">
+            <span class="kpi-label">In Progress</span>
+            <strong id="statProgress" class="kpi-value">0</strong>
+          </div>
+          <div class="kpi-card kpi-resolved">
+            <span class="kpi-label">Resolved</span>
+            <strong id="statResolved" class="kpi-value">0</strong>
+          </div>
+        </div>
+
+        <div class="summary-box">
+          <h3>Location-Wise Issue Summary</h3>
+          <div id="locationSummary" class="location-summary-content"></div>
+        </div>
+      </section>
+
+      <!-- Main 2-Column Workspace -->
+      <div class="workspace-grid">
+        <!-- 2. Structured Form for Raising Complaints (Hidden for Admin / Staff) -->
+        <section id="complaintFormSection" aria-labelledby="form-heading" class="card">
+          <h2 id="form-heading">Submit Cleanliness Complaint</h2>
+          <form id="feedbackForm" novalidate>
+            <input type="hidden" id="reportId" />
+
+            <div class="form-group">
+              <label for="title">Issue Title *</label>
+              <input type="text" id="title" placeholder="e.g., Overflowing dustbin near door" maxlength="80" />
+              <small class="error-text" id="err-title"></small>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="category">Category *</label>
+                <select id="category">
+                  <option value="">-- Select Category --</option>
+                  <option value="Classroom">Classroom</option>
+                  <option value="Washroom">Washroom</option>
+                  <option value="Corridor & Stairs">Corridor & Stairs</option>
+                  <option value="Common Area">Common Area</option>
+                </select>
+                <small class="error-text" id="err-category"></small>
+              </div>
+
+              <div class="form-group">
+                <label for="location">Campus Location *</label>
+                <select id="location">
+                  <option value="">-- Select Location --</option>
+                  <optgroup label="Academic Blocks">
+                    <option value="Academic Block - School of Computing">Academic Block - School of Computing</option>
+                    <br>
+                    <option value="Academic Block - School of Law">Academic Block - School of Law</option>
+                    <br>
+                    <option value="Academic Block - School of Agriculture">Academic Block - School of Agriculture</option>
+                    <br>
+                    <option value="Academic Block - School of Pharmacy">Academic Block - School of Pharmacy</option>
+                    <br>
+                    <option value="Academic Block - School of Commerce">Academic Block - School of Commerce</option>
+                    <br>
+                    <option value="Academic Block - School of Physical Education">Academic Block - School of Physical Education</option>
+                  </optgroup>
+                  <optgroup label="Food Courts &amp; Dining">
+                    <option value="Food Court near Central Mess-1">Food Court near Central Mess-1</option>
+                    <option value="Food Court behind BH-1">Food Court behind BH-1</option>
+                    <option value="Food Court near 34 Block">Food Court near 34 Block</option>
+                  </optgroup>
+                  <optgroup label="Campus Facilities &amp; Landmarks">
+                    <option value="Near Uni Mall">Near Uni Mall</option>
+                    <option value="Uni Hospital">Uni Hospital</option>
+                    <option value="Robo Park">Robo Park</option>
+                    <option value="UniPolis">UniPolis</option>
+                    <option value="Sports Arena">Sports Arena</option>
+                  </optgroup>
+                </select>
+                <small class="error-text" id="err-location"></small>
+              </div>
+            </div>
+
+            <div class="form-row">
+              <div class="form-group">
+                <label for="roomDetail">Room / Floor Detail *</label>
+                <input type="text" id="roomDetail" placeholder="e.g., 2nd Floor, Room 204" maxlength="40" />
+                <small class="error-text" id="err-roomDetail"></small>
+              </div>
+
+              <div class="form-group" id="statusFieldGroup">
+                <label for="status">Progress Status *</label>
+                <select id="status">
+                  <option value="Reported">Reported</option>
+                  <option value="In Progress">In Progress</option>
+                  <option value="Resolved">Resolved</option>
+                </select>
+                <small class="error-text" id="err-status"></small>
+              </div>
+            </div>
+
+            <div class="form-group">
+              <label for="reportedBy">Reported By (Name / Reg. No.) *</label>
+              <input type="text" id="reportedBy" placeholder="e.g., Priyam Manglik (12616721)" maxlength="50" />
+              <small class="error-text" id="err-reportedBy"></small>
+            </div>
+
+            <div class="form-group">
+              <label for="description">Issue Description *</label>
+              <textarea id="description" rows="3" placeholder="Describe the cleanliness issue clearly..." maxlength="300"></textarea>
+              <small class="error-text" id="err-description"></small>
+            </div>
+
+            <div class="form-actions">
+              <button type="submit" id="submitBtn" class="btn btn-primary">Submit Complaint</button>
+              <button type="button" id="cancelEditBtn" class="btn btn-secondary hidden">Cancel Edit</button>
+            </div>
+
+            <p class="form-note">
+              Note: Once submitted, complaints are locked for reporters and tracked by Ticket ID. Status updates, edits, and deletions are restricted to Admin / Staff.
+            </p>
+          </form>
+        </section>
+
+        <!-- 3. Search, Filter & Complaint Tracking List -->
+        <section aria-labelledby="list-heading" class="card">
+          <div class="list-header">
+            <h2 id="list-heading">Categorized Complaints &amp; Tracking</h2>
+            <span id="resultCount" class="badge-count">0 shown</span>
+          </div>
+
+          <div class="filter-bar">
+            <input type="search" id="searchInput" placeholder="Search by ticket, title, room, reporter..." />
+            <select id="filterCategory">
+              <option value="ALL">All Categories</option>
+              <option value="Classroom">Classroom</option>
+              <option value="Washroom">Washroom</option>
+              <option value="Corridor & Stairs">Corridor & Stairs</option>
+              <option value="Common Area">Common Area</option>
+            </select>
+            <select id="filterLocation">
+              <option value="ALL">All Locations</option>
+              <optgroup label="Academic Blocks">
+                <option value="Academic Block - School of Computing">Academic Block - School of Computing</option>
+                <option value="Academic Block - School of Law">Academic Block - School of Law</option>
+                <option value="Academic Block - School of Agriculture">Academic Block - School of Agriculture</option>
+                <option value="Academic Block - School of Pharmacy">Academic Block - School of Pharmacy</option>
+                <option value="Academic Block - School of Commerce">Academic Block - School of Commerce</option>
+                <option value="Academic Block - School of Physical Education">Academic Block - School of Physical Education</option>
+              </optgroup>
+              <br>
+              <optgroup label="Food Courts &amp; Dining">
+                <option value="Food Court near Central Mess-1">Food Court near Central Mess-1</option>
+                <option value="Food Court behind BH-1">Food Court behind BH-1</option>
+                <option value="Food Court near 34 Block">Food Court near 34 Block</option>
+              </optgroup>
+              <br>
+              <optgroup label="Campus Facilities &amp; Landmarks">
+                <option value="Near Uni Mall">Near Uni Mall</option>
+                <option value="Uni Hospital">Uni Hospital</option>
+                <option value="Robo Park">Robo Park</option>
+                <option value="UniPolis">UniPolis</option>
+                <option value="Sports Arena">Sports Arena</option>
+              </optgroup>
+            </select>
+            <select id="filterStatus">
+              <option value="ALL">All Statuses</option>
+              <option value="Reported">Reported</option>
+              <option value="In Progress">In Progress</option>
+              <option value="Resolved">Resolved</option>
+            </select>
+          </div>
+
+          <div id="reportsList" class="reports-list"></div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="container">
+        <p>Campus Cleanliness Feedback Portal • Developed by Sidhant Bhardwaj, Vinayak Mahajan &amp; Priyam Manglik</p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Complaint Submitted Success Modal Popup -->
+  <div id="successModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-card">
+      <div class="modal-icon-wrap">
+        <div class="modal-icon-circle">
+          <span>✓</span>
+        </div>
+      </div>
+      <h3 id="modalTitle">Complaint Reported Successfully!</h3>
+      <p class="modal-subtitle">Your cleanliness report has been logged and locked for review by campus staff.</p>
+
+      <div class="modal-summary-box">
+        <div class="modal-row">
+          <span class="modal-row-label">Ticket ID:</span>
+          <strong id="modalTicketId" class="modal-ticket"></strong>
+        </div>
+        <div class="modal-row">
+          <span class="modal-row-label">Issue Title:</span>
+          <span id="modalIssueTitle" class="modal-row-val"></span>
+        </div>
+        <div class="modal-row">
+          <span class="modal-row-label">Location:</span>
+          <span id="modalLocation" class="modal-row-val"></span>
+        </div>
+        <div class="modal-row">
+          <span class="modal-row-label">Reported By:</span>
+          <span id="modalReportedBy" class="modal-row-val"></span>
+        </div>
+        <div class="modal-row">
+          <span class="modal-row-label">Status:</span>
+          <span class="status-pill status-Reported">Reported</span>
+        </div>
+      </div>
+
+      <div class="modal-actions">
+        <button type="button" id="modalCloseBtn" class="btn btn-primary btn-full">OK, View in Feed</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="storage.js"></script>
+  <script src="validation.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
